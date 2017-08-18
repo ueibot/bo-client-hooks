@@ -1,1 +1,3 @@
-# bo-client-hooks
+# Hooks for bo-client
+
+Contains a Weather, Movie and Stockmarket information hook

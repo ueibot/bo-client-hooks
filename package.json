@@ -1,0 +1,30 @@
+{
+  "name": "bo-weather-hook",
+  "version": "1.0.0",
+  "description": "A Webhook to fetch weather data for use with the bo-client in API.ai",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.15.4",
+    "body-parser": "^1.17.2",
+    "moviedb": "^0.2.8",
+    "lodash": "^4.17.4",
+    "tickertape": "^1.0.4",
+    "request": "^2.81.0"
+  },
+  "engines": {
+    "node": "8.x"
+  },
+  "repository": {
+    "url": "https://glitch.com/edit/#!/bo-weather-hook"
+  },
+  "license": "UNLICENSED",
+  "keywords": [
+    "node",
+    "glitch",
+    "api.ai",
+    "express"
+  ]
+}
