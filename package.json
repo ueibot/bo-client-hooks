@@ -12,7 +12,9 @@
     "moviedb": "^0.2.8",
     "lodash": "^4.17.4",
     "tickertape": "^1.0.4",
-    "request": "^2.81.0"
+    "request": "^2.81.0",
+    "openweather-apis": "^3.3.2",
+    "darksky": "^0.1.2"
   },
   "engines": {
     "node": "8.x"

@@ -1,27 +1,80 @@
 const http = require('http');
+const weather = require('openweather-apis');
+const darksky = require("darksky");
+const AiResponse = require('./ai-response.js');
 
-module.exports = (req, res) => {
+weather.setLang('en');
+weather.setUnits('metric');
+weather.setAPPID(process.env.OPENWEATHER_API_KEY);
+
+module.exports = (query, res) => {
   //console.log('weatherWebhook', req.body);
   // Get the city and date from the request
-  let city = req.body.result.parameters['geo-city']; // city is a required param
+  let city = query.parameters['geo-city']; // city is a required param
   // Get the date for the weather forecast (if present)
   let date = '';
   
-  if (req.body.result.parameters['date']) {
-    date = req.body.result.parameters['date'];
+  if (query.parameters['date']) {
+    date = query.parameters['date'];
     console.log('Date: ' + date);
   }
   res.setHeader('Content-Type', 'application/json');
   
-  // Call the weather API
-  callWeatherApi(city, date).then((output) => {
-    // Return the results of the weather API to API.AI
-    res.send(JSON.stringify({ 'speech': output, 'displayText': output }));
-  }).catch((error) => {
-    // If there is an error let the user know
-    res.send(JSON.stringify({ 'speech': error, 'displayText': error }));
+  switch(query.action) {
+    case 'weather.forecast':
+      callOpenWeatherForecastApi(city).then((output) => respond(res, output)).catch(err => respond(res, err));
+    break;
+    case 'weather.city.date':
+      callOpenWeatherApi(city, date).then((output) => respond(res, output)).catch(err => respond(res, err));
+    break;
+  }
+}
+
+function respond(res, output) {
+  res.send(JSON.stringify(output));
+}
+
+function callOpenWeatherForecastApi(query) {
+  
+  //console.log(query);
+  let output = "";
+  
+  return new Promise((resolve, reject) => {
+    //weather.setCity(city);
+    weather.getWeatherForecast(function(err, data) {
+      
+      if (err) reject(err);
+      
+      let output = `Forecast for ${data.city.name}
+Today ${data.list[0].weather[0].description}
+Tomorrow ${data.list[7].weather[0].description}
+`;
+           
+       let response = new AiResponse(output);
+       response.addContextOut('forecast', 5, data);
+            
+      resolve(response.response);
+    });  
+  });
+  
+}
+
+function callOpenWeatherApi(city) {
+  return new Promise((resolve, reject) => {
+    weather.setCity(city);
+	  weather.getAllWeather(function(err, data){
+      let output = `Current conditions in ${data['name']} are ${data['weather'][0]['description']} with a projected high of
+        ${data['main']['temp_max']}°C and a low of 
+        ${data['main']['temp_min']}°C. Would you like a forecast?`;
+      
+      let response = new AiResponse(output);
+      response.addContextOut('howistheweather-followup', 2, data);
+      
+      resolve(response.response);
+	  });
   });
 }
+
 
 
 function callWeatherApi (city, date) {

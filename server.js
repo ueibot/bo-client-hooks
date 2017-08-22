@@ -15,12 +15,23 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // parse application/json
 app.use(bodyParser.json())
 
+app.get('/', (req, res) => {
+  
+  movieHook({action: 'find.movie.by.genre', parameters: { genre: 'Action'}}, res);
+  
+});
+
 // check incomming web hook requets
 app.post('/webhook', (req, res) => {
+  
+  //console.log(req.body);
+  
   switch(req.body.result.action) {
     case 'find.movie.by.genre':
+    case 'find.plot.for.movie':
       movieHook(req.body.result, res);
     break;
+    case 'weather.forecast':
     case 'weather.city.date':
       weatherHook(req.body.result, res);
     break;

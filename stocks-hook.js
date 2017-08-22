@@ -21,15 +21,15 @@ function findByCompany(company) {
   return new Promise((resolve, reject) => {
     request.get(`http://autoc.finance.yahoo.com/autoc?query=${company}&region=EU&lang=en-GB`, (error, response, body) => {
       let data = JSON.parse(body);
-      let nasdaq = _.filter(data.ResultSet.Result, { exch: 'NAS', type: 'S'});
+      let nasdaq = _.filter(data.ResultSet.Result, { exchDisp: 'NASDAQ'});
       let stock = nasdaq[0];
-      console.log(stock);
+      //console.log(error, nasdaq, stock, data.ResultSet.Result);
       if (stock) {
         request.get(`http://marketdata.websol.barchart.com/getQuote.json?apikey=${process.env.BARCHART_API_KEY}&symbols=${stock.symbol}`, (err, res, body) => {
           let data = JSON.parse(body);
           let stock = data.results[0];
           console.log(stock);
-          resolve(`The last price for ${stock.name} stock was $${stock.lastPrice}`);
+          resolve(`The last price for ${stock.name} stock on NASDAQ was $${stock.lastPrice}`);
         });
       } else {
         reject(`Could not find information for ${company}`)
